@@ -21,7 +21,8 @@ jobs:
         TAG: ${{ github.event.release.tag_name }}
       run: |
         $0, $1 = $env:TAG.split('-')
-        Write-Output "::set-output name=_0::$0 name=_1::$1"
+        Write-Output "::set-output name=_0::$0"
+        Write-Output "::set-output name=_1::$1"
 
     - name: Publish to PowerShell Gallery
       shell: pwsh
