@@ -1,0 +1,24 @@
+name: Lint
+
+on:
+  push:
+
+permissions:
+  contents: read
+
+jobs:
+  lint:
+    runs-on: windows-latest
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v2
+
+    - name: Install PSScriptAnalyzer
+      shell: pwsh
+      run: |
+        Set-PSRepository PSGallery -InstallationPolicy Trusted
+        Install-Module PSScriptAnalyzer -ErrorAction Stop
+
+    - name: Run PSScriptAnalyzer
+      shell: pwsh
+      run: Invoke-ScriptAnalyzer PSWoolworthsRewards

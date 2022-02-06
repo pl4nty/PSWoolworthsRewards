@@ -1,0 +1,34 @@
+name: Release
+
+on:
+  release:
+    types: [published]
+
+permissions:
+  contents: read
+
+jobs:
+  release:
+    if: ${{ !github.event.release.draft }}
+    runs-on: windows-latest
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v2
+
+    - uses: jungwinter/split@v2
+      id: split
+      with:
+        msg: ${{ github.event.release.tag_name }}
+        separator: '-'
+        maxsplit: 1
+
+    - name: Publish to PowerShell Gallery
+      shell: pwsh
+      env:
+        VERSION: ${{ steps.split.outputs._0 }}
+        PRERELEASE: ${{ github.event.release.prerelease && steps.split.outputs._1 || '''''' }} # ensure non-empty string (truthy)
+      working-directory: PSWoolworthsRewards
+      run: |
+        $manifest = Get-Content PSWoolworthsRewards.ps1 -replace "{{VERSION}}" $env:VERSION -replace "'{{PRERELEASE}}'" $env:PRERELEASE
+        Set-Content PSWoolworthsRewards.psd1 -Value $manifest
+        Publish-Module -Path . -NuGetApiKey ${{ secrets.PS_GALLERY_KEY }}
