@@ -15,12 +15,13 @@ jobs:
     - name: Checkout
       uses: actions/checkout@v2
 
-    - uses: jungwinter/split@v2
-      id: split
-      with:
-        msg: ${{ github.event.release.tag_name }}
-        separator: '-'
-        maxsplit: 1
+    - id: split
+      shell: pwsh
+      env:
+        TAG: ${{ github.event.release.tag_name }}
+      run: |
+        $0, $1 = $env:TAG.split('-')
+        Write-Output "::set-output name=_0::$0 name=_1::$1"
 
     - name: Publish to PowerShell Gallery
       shell: pwsh
